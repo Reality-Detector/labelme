@@ -872,7 +872,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def setDirty(self):
         # Even if we autosave the file, we keep the ability to undo
         self.actions.undo.setEnabled(self.canvas.isShapeRestorable)
-
         if self._config["auto_save"] or self.actions.saveAuto.isChecked():
             label_file = osp.splitext(self.imagePath)[0] + ".json"
             if self.output_dir:
@@ -1572,8 +1571,9 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.labelFile.flags is not None:
                 flags.update(self.labelFile.flags)
         self.loadFlags(flags)
-        if self._config["keep_prev"] and self.noShapes():
-            self.loadShapes(prev_shapes, replace=False)
+        if self._config["keep_prev"]:#and self.noShapes()
+            self.labelList.clear()
+            self.loadShapes(prev_shapes, replace=True)
             self.setDirty()
         else:
             self.setClean()
