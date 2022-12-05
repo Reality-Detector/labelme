@@ -1540,6 +1540,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 osp.dirname(label_file),
                 self.labelFile.imagePath,
             )
+            if self.labelFile.imagePath == "":
+                self.imagePath = label_file
             self.otherData = self.labelFile.otherData
         else:
             self.imageData = LabelFile.load_image_file(filename)
@@ -2152,6 +2154,9 @@ class MainWindow(QtWidgets.QMainWindow):
                         # get the absolute path from image relative path
                         mod_path = Path(root)
                         imagePath = (mod_path / data["imagePath"]).resolve()
+                        if data["imagePath"] == '':
+                            imagePath = jsonRelativePath
+                        
 
                         images.append(str(imagePath))
                         labels.append(jsonRelativePath)
