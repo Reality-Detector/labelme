@@ -91,6 +91,7 @@ class Canvas(QtWidgets.QWidget):
         self.hShapeIsSelected = False
         self._painter = QtGui.QPainter()
         self._cursor = CURSOR_DEFAULT
+        self.moveMultiple = True
         # Menus:
         # 0: right-click without selection and dragging of shapes
         # 1: right-click with selection and dragging of shapes
@@ -550,6 +551,20 @@ class Canvas(QtWidgets.QWidget):
         if self.outOfPixmap(pos):
             pos = self.intersectionPoint(point, pos)
         shape.moveVertexBy(index, pos - point)
+        if self.moveMultiple:
+            pointRadius = 50
+            for other_shape in reversed([s for s in self.shapes if self.isVisible(s)]):
+                if other_shape == shape:
+                    continue
+                other_shape_points = other_shape.points[0]
+                other_shape_point_x = other_shape_points.x()
+                other_shape_point_y = other_shape_points.y()
+                point_x = point.x()
+                point_y = point.y()
+                if (other_shape_point_x <= point_x + pointRadius and other_shape_point_x >= point_x - pointRadius) and (other_shape_point_y <= point_y + pointRadius and other_shape_point_y >= point_y - pointRadius):
+                    point_difference = point - other_shape_points
+                    weights = 1 - (point_difference.manhattanLength() / 100)
+                    other_shape.moveVertexBy(index, (pos - point) * weights)
 
     def boundedMoveShapes(self, shapes, pos):
         if self.outOfPixmap(pos):

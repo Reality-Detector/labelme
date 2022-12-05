@@ -375,6 +375,14 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr("Move and edit the selected polygons"),
             enabled=False,
         )
+        meshAdjustment = action(
+            self.tr("Mesh Adjustment"),
+            self.setMeshAdjustment,
+            shortcuts["mesh_adjustment"],
+            "edit",
+            self.tr("Adjust mesh"),
+            enabled=False,
+        )
 
         delete = action(
             self.tr("Delete Polygons"),
@@ -598,6 +606,7 @@ class MainWindow(QtWidgets.QMainWindow):
             removePoint=removePoint,
             createMode=createMode,
             editMode=editMode,
+            meshAdjustment =meshAdjustment,
             createRectangleMode=createRectangleMode,
             createCircleMode=createCircleMode,
             createLineMode=createLineMode,
@@ -638,6 +647,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 createPointMode,
                 createLineStripMode,
                 editMode,
+                meshAdjustment,
                 edit,
                 duplicate,
                 copy,
@@ -656,6 +666,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 createPointMode,
                 createLineStripMode,
                 editMode,
+                meshAdjustment,
                 brightnessContrast,
             ),
             onShapesPresent=(saveAs, hideAll, showAll),
@@ -741,6 +752,7 @@ class MainWindow(QtWidgets.QMainWindow):
             None,
             createMode,
             editMode,
+            meshAdjustment,
             duplicate,
             copy,
             paste,
@@ -853,6 +865,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.actions.createPointMode,
             self.actions.createLineStripMode,
             self.actions.editMode,
+            self.actions.meshAdjustment
         )
         utils.addActions(self.menus.edit, actions + self.actions.editMenu)
 
@@ -946,13 +959,17 @@ class MainWindow(QtWidgets.QMainWindow):
         In the middle of drawing, toggling between modes should be disabled.
         """
         self.actions.editMode.setEnabled(not drawing)
+        self.actions.meshAdjustment.setEnabled(not drawing)
         self.actions.undoLastPoint.setEnabled(drawing)
         self.actions.undo.setEnabled(not drawing)
         self.actions.delete.setEnabled(not drawing)
 
-    def toggleDrawMode(self, edit=True, createMode="polygon"):
+    def toggleDrawMode(self, edit=True, createMode="polygon", mode="mesh"):
         self.canvas.setEditing(edit)
         self.canvas.createMode = createMode
+        self.canvas.moveMultiple = False
+        if(mode == "mesh"):
+            self.canvas.moveMultiple = True
         if edit:
             self.actions.createMode.setEnabled(True)
             self.actions.createRectangleMode.setEnabled(True)
@@ -1005,10 +1022,18 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.actions.createLineStripMode.setEnabled(False)
             else:
                 raise ValueError("Unsupported createMode: %s" % createMode)
-        self.actions.editMode.setEnabled(not edit)
+        if mode == "mesh":
+            self.actions.meshAdjustment.setEnabled(not edit)
+            self.actions.editMode.setEnabled(edit)
+        else:
+            self.actions.editMode.setEnabled(not edit)
+            self.actions.meshAdjustment.setEnabled(edit)
 
     def setEditMode(self):
-        self.toggleDrawMode(True)
+        self.toggleDrawMode(True,mode="edit")
+
+    def setMeshAdjustment(self):
+        self.toggleDrawMode(True,mode="mesh")
 
     def updateFileMenu(self):
         current = self.filename
@@ -1364,6 +1389,7 @@ class MainWindow(QtWidgets.QMainWindow):
             shape.group_id = group_id
             self.addLabel(shape)
             self.actions.editMode.setEnabled(True)
+            self.actions.meshAdjustment.setEnabled(True)
             self.actions.undoLastPoint.setEnabled(False)
             self.actions.undo.setEnabled(True)
             self.setDirty()
