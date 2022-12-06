@@ -14,8 +14,8 @@ file_search: null
 sort_labels: true
 validate_label: null
 
-default_shape_color: [0, 255, 0]
-shape_color: auto  # null, 'auto', 'manual'
+default_shape_color: [217, 25, 11]
+shape_color: manual  # null, 'auto', 'manual'
 shift_auto_shape_color: 0
 label_colors: null
 
@@ -28,7 +28,7 @@ shape:
   select_line_color: [255, 255, 255, 255]
   select_fill_color: [0, 255, 0, 155]
   hvertex_fill_color: [255, 255, 255, 255]
-  point_size: 8
+  point_size: 5
 
 # main
 flag_dock:
