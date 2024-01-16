@@ -1,3 +1,6 @@
+## Context
+A labelme fork for labelling images with mesh stretching. Mainly used for facial points labelling on thermal images
+
 <h1 align="center">
   <img src="labelme/icons/icon.png"><br/>labelme
 </h1>
